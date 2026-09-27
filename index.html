@@ -77,10 +77,34 @@
         <link rel="preload" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Quicksand:wght@400;700&family=Cormorant+Upright:wght@400;700&family=Oswald:wght@400;700&family=Tinos:wght@400;700&family=Philosopher:wght@400;700&family=Lora:wght@400;700&family=Judson:wght@400;700&display=swap" as="style" onload="this.onload = null; this.rel = 'stylesheet';">
         <link rel="preload" href="https://w.ladicdn.com/v5/source/ladipagev3.min.js?v=1790072915780" as="script">
         <link rel="stylesheet" href="style.css" type="text/css">
+        <script id="hide-powered-by" type="text/javascript">
+            // Xoá huy hiệu "Powered by LadiPage" do ladipagev3.min.js tự chèn (class ngẫu nhiên mỗi lần tải)
+            (function() {
+                var BADGE_IMAGE = 'source/v3/by/ladipage.svg';
+                var removeBadge = function(styleEl) {
+                    var css = styleEl.textContent || '';
+                    if (css.indexOf(BADGE_IMAGE) === -1) return;
+                    var match = css.match(/^\s*\.([\w-]+)\s*\{/);
+                    if (match) {
+                        document.querySelectorAll('.' + match[1]).forEach(function(el) { el.remove(); });
+                    }
+                    styleEl.remove();
+                };
+                new MutationObserver(function(mutations) {
+                    mutations.forEach(function(m) {
+                        m.addedNodes.forEach(function(node) {
+                            if (node.tagName === 'STYLE') removeBadge(node);
+                        });
+                        // Script gán nội dung CSS sau khi đã chèn thẻ <style>
+                        if (m.type === 'childList' && m.target.tagName === 'STYLE') removeBadge(m.target);
+                    });
+                }).observe(document.documentElement, { childList: true, subtree: true });
+            })();
+        </script>
         <script id="door-ready" type="text/javascript">
             // Đợi trang + 2 ảnh cánh cửa tải xong rồi mới mở cửa (tối đa 8 giây)
             (function() {
-                var DELAY_AFTER_LOAD = 1200; // ms, nghỉ một chút sau khi tải xong rồi mới mở
+                var DELAY_AFTER_LOAD = 1000; // ms, nghỉ một chút sau khi tải xong rồi mới mở
                 var MAX_WAIT = 10000;        // ms, mạng chậm quá thì vẫn mở cửa
                 var opened = false;
                 var open = function() {
