@@ -77,6 +77,37 @@
         <link rel="preload" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Quicksand:wght@400;700&family=Cormorant+Upright:wght@400;700&family=Oswald:wght@400;700&family=Tinos:wght@400;700&family=Philosopher:wght@400;700&family=Lora:wght@400;700&family=Judson:wght@400;700&display=swap" as="style" onload="this.onload = null; this.rel = 'stylesheet';">
         <link rel="preload" href="https://w.ladicdn.com/v5/source/ladipagev3.min.js?v=1790072915780" as="script">
         <link rel="stylesheet" href="style.css" type="text/css">
+        <script id="door-ready" type="text/javascript">
+            // Đợi trang + 2 ảnh cánh cửa tải xong rồi mới mở cửa (tối đa 8 giây)
+            (function() {
+                var DELAY_AFTER_LOAD = 300; // ms, nghỉ một chút sau khi tải xong rồi mới mở
+                var MAX_WAIT = 8000;        // ms, mạng chậm quá thì vẫn mở cửa
+                var opened = false;
+                var open = function() {
+                    if (opened) return;
+                    opened = true;
+                    document.body.classList.add('page-ready');
+                };
+                var doors = [
+                    'https://w.ladicdn.com/644bd195fdccd700206206ea/curtain-red-right-20260423120933-a1bn2.webp',
+                    'https://w.ladicdn.com/644bd195fdccd700206206ea/curtain-red-left-20260423120931-zn7ep.webp'
+                ].map(function(src) {
+                    return new Promise(function(resolve) {
+                        var img = new Image();
+                        img.onload = img.onerror = resolve;
+                        img.src = src;
+                    });
+                });
+                var pageLoaded = new Promise(function(resolve) {
+                    if (document.readyState === 'complete') resolve();
+                    else window.addEventListener('load', resolve);
+                });
+                Promise.all(doors.concat(pageLoaded)).then(function() {
+                    setTimeout(open, DELAY_AFTER_LOAD);
+                });
+                setTimeout(open, MAX_WAIT);
+            })();
+        </script>
         <style type="text/css" id="style_animation">
             @media (max-width: 767px) {
                 #HEADLINE3, #PARAGRAPH2, #PARAGRAPH3, #PARAGRAPH4, #PARAGRAPH5, #PARAGRAPH7, #GROUP5, #GROUP22, #IMAGE43, #IMAGE44, #IMAGE45, #IMAGE46, #IMAGE47, #IMAGE48, #IMAGE49, #IMAGE50, #IMAGE51, #IMAGE52, #PARAGRAPH48, #IMAGE67, #IMAGE68, #IMAGE69, #IMAGE70, #IMAGE71, #BUTTON10, #PARAGRAPH248, #PARAGRAPH249, #PARAGRAPH250, #GROUP4, #GROUP87, #IMAGE21 {
@@ -1567,7 +1598,13 @@
                                     #IMAGE119,#IMAGE120 {
                                         position: absolute;
                                         bottom: 10px;
-                                        animation: mH 3s ease-in-out forwards
+                                        animation: mH 3s ease-in-out forwards;
+                                        animation-play-state: paused
+                                    }
+
+                                    /* Chỉ mở cửa khi trang đã tải xong (xem script "door-ready" trong <head>) */
+                                    body.page-ready #IMAGE119,body.page-ready #IMAGE120 {
+                                        animation-play-state: running
                                     }
 
                                     #IMAGE119 {
