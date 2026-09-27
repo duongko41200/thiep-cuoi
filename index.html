@@ -80,8 +80,8 @@
         <script id="door-ready" type="text/javascript">
             // Đợi trang + 2 ảnh cánh cửa tải xong rồi mới mở cửa (tối đa 8 giây)
             (function() {
-                var DELAY_AFTER_LOAD = 300; // ms, nghỉ một chút sau khi tải xong rồi mới mở
-                var MAX_WAIT = 8000;        // ms, mạng chậm quá thì vẫn mở cửa
+                var DELAY_AFTER_LOAD = 1200; // ms, nghỉ một chút sau khi tải xong rồi mới mở
+                var MAX_WAIT = 10000;        // ms, mạng chậm quá thì vẫn mở cửa
                 var opened = false;
                 var open = function() {
                     if (opened) return;
@@ -102,7 +102,11 @@
                     if (document.readyState === 'complete') resolve();
                     else window.addEventListener('load', resolve);
                 });
-                Promise.all(doors.concat(pageLoaded)).then(function() {
+                // Kiểm tra font sau khi trang tải xong, vì font Google được nạp muộn
+                var fontsLoaded = pageLoaded.then(function() {
+                    return document.fonts ? document.fonts.ready : null;
+                });
+                Promise.all(doors.concat(fontsLoaded)).then(function() {
                     setTimeout(open, DELAY_AFTER_LOAD);
                 });
                 setTimeout(open, MAX_WAIT);
